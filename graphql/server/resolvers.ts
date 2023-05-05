@@ -1,6 +1,5 @@
 import { Resolver } from 'types';
 
-const resolvers = {
-};
+const resolvers = {}
 
 export { resolvers };

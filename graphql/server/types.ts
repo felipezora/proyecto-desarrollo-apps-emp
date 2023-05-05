@@ -16,7 +16,9 @@ const typeDefs = gql`
     name: String
     emailVerified: DateTime
     department: Department
+    departmentId: String
     role: Role
+    roleId: String
     departmentLeader: [Department]
     projectLeader: [Project]
     projectMember: [Project]
@@ -28,7 +30,9 @@ const typeDefs = gql`
     start_date: DateTime
     end_date: DateTime
     leader: User
+    id_leader: String
     department: Department
+    departmentId: String
     employees: [User]
     files: [File]
   }
@@ -42,6 +46,7 @@ const typeDefs = gql`
   type Department {
     id: ID
     name: String
+    departmentLeaderId: String
     leader: User
     employees: [User]
     projects: [Project]
@@ -53,6 +58,7 @@ const typeDefs = gql`
     name: String
     url: String
     project: Project
+    projectId: String
   }
 
   type Query {
