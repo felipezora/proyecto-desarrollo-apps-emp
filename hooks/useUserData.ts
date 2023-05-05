@@ -23,7 +23,7 @@ const useUserData = () => {
     status,
     session,
     userData,
-    role: userData?.user.role.name,
+    role: userData?.user?.role?.name,
   };
 };
 

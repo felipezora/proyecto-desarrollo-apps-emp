@@ -26,7 +26,7 @@ const PrivateRoute = ({ role, children }: PrivateRouteProps) => {
       </div>
     );
 
-  if (role && role !== userRole)
+  if ((role && role !== userRole) || (!userRole))
     return (
       <div className='flex h-screen w-full flex-col items-center justify-center gap-4'>
         <h1 className='text-5xl text-red-500'>
