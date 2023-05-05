@@ -1,3 +1,4 @@
+import { Loading } from '@components/Loading';
 import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import React from 'react';
@@ -5,7 +6,7 @@ import React from 'react';
 const HomePage = () => {
   const { data: session, status } = useSession();
 
-  if (status === 'loading') return <div>Loading...</div>;
+  if (status === 'loading') return <Loading />;
   return (
     <div className='flex h-screen w-full flex-col items-center justify-center gap-5'>
       <h1 className='text-6xl'>Sistema de gestión de proyectos</h1>
