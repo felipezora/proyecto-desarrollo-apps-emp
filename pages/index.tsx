@@ -1,8 +1,11 @@
 import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import React from 'react';
+import Prisma from '@prisma/client';
+
 
 const HomePage = () => {
+  console.log("prismaaa", Prisma);
   const { data: session, status } = useSession();
 
   if (status === 'loading') return <div>Loading...</div>;

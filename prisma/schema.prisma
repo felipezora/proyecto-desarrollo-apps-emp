@@ -50,7 +50,7 @@ model Role {
 
 model User {
   id               String       @id @default(cuid())
-  email            String?      @unique
+  email            String       @unique
   image            String?
   name             String?
   emailVerified    DateTime?
@@ -80,18 +80,18 @@ model Profile {
 }
 
 model Project {
-  id           String      @id @default(cuid())
+  id           String     @id @default(cuid())
   name         String
   start_date   DateTime
   end_date     DateTime
-  leader       User?       @relation(fields: [id_leader], references: [id], name: "project-leader")
+  leader       User?      @relation(fields: [id_leader], references: [id], name: "project-leader")
   id_leader    String?
-  department   Department? @relation(fields: [departmentId], references: [id], name: "project-department")
-  departmentId String?
-  employees    User[]      @relation(name: "project-member")
-  files        File[]      @relation(name: "project-files")
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  department   Department @relation(fields: [departmentId], references: [id], name: "project-department")
+  departmentId String
+  employees    User[]     @relation(name: "project-member")
+  files        File[]     @relation(name: "project-files")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
 model Log {
@@ -116,8 +116,8 @@ model File {
   format    String
   name      String
   url       String
-  project   Project? @relation(fields: [projectId], references: [id], name: "project-files")
-  projectId String?
+  project   Project  @relation(fields: [projectId], references: [id], name: "project-files")
+  projectId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -3,12 +3,6 @@ import { gql } from 'graphql-tag';
 const typeDefs = gql`
   scalar DateTime
 
-  type Invoice {
-    id: ID
-    date: DateTime
-    value: Float
-  }
-
   type Role {
     id: ID
     name: String
@@ -17,65 +11,71 @@ const typeDefs = gql`
 
   type User {
     id: ID
-    name: String
     email: String
     image: String
+    name: String
+    emailVerified: DateTime
+    department: Department
     role: Role
-    collections: [Collecton]
+    departmentLeader: [Department]
+    projectLeader: [Project]
+    projectMember: [Project]
   }
 
-  type Lot {
+  type Project{
     id: ID
     name: String
-    collections: [Collecton]
-    createdAt: DateTime
-    updatedAt: DateTime
+    start_date: DateTime
+    end_date: DateTime
+    leader: User
+    department: Department
+    employees: [User]
+    files: [File]
   }
 
-  type Collecton {
+  type Log{
     id: ID
-    bunches: Int
-    collectionDate: DateTime
-    lot: Lot
-    month: String
-    year: Int
-    createdBy: User
+    description: String
     createdAt: DateTime
-    updatedAt: DateTime
   }
 
-  type Shipment {
+  type Department {
     id: ID
-    shippedBunches: Int
-    shipmentDate: DateTime
-    bunchWeight: Float
-    deliveredWeight: Float
-    createdBy: User
-    createdAt: DateTime
-    updatedAt: DateTime
+    name: String
+    leader: User
+    employees: [User]
+    projects: [Project]
+  }
+
+  type File {
+    id: ID
+    format: String
+    name: String
+    url: String
+    project: Project
   }
 
   type Query {
-    users: [User]
     user(email: String!): User
-    collections: [Collecton]
-    filterCollections(month: Int, year: Int): [Collecton]
-    invoices: [Invoice]
-    lots: [Lot]
+    users: [User]
+    userEmployeeProjects(idUser: String!): [Project]
+    userLeaderProjects(idUser: String!): [Project]
+    userLeaderDepartments(idUser: String!): [Department]
+    projectFiles(idProject: String!): [File]
   }
 
   type Mutation {
-    createUser(name: String!, email: String!, password: String!): User
-    createCollection(
-      lot: String
-      bunches: Int
-      collectionDate: DateTime
-    ): Collecton
-    createShipment(
-      shipmentDate: String
-      shippedBunches: Int
-      deliveredWeight: Float
-    ): Shipment
+    createProject(name: String!, start_date: DateTime!, end_date: DateTime!): Project
+    setProjectLeader(idLeader: String!): Project
+    addProjectEmployee(idEmployee: String!): Project
+    removeProjectEmployee(idEmployee: String!): Project
+    deleteProject(idProject: String!): Project
+    createDepartment(name: String!, idLeader: String!): Department
+    addDepartmentEmployee(idDepartment: String!, idEmployee: String!): Department
+    createFile(format: String!, name: String!, url: String!): File
+    setProjectFile(idProject: String!): File
+    removeProjectFile(idFile: String!): Project
+    changeUserRole(idUser: String!): User
   }
 `;
 
