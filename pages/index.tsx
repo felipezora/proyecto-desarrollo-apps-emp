@@ -8,7 +8,7 @@ const HomePage = () => {
   if (status === 'loading') return <div>Loading...</div>;
   return (
     <div className='flex h-screen w-full flex-col items-center justify-center gap-5'>
-      <h1 className='text-6xl'>Sistema de Recogidas y Despachos</h1>
+      <h1 className='text-6xl'>Sistema de gestión de proyectos</h1>
       {session ? (
         <Link href='/app'>
           <button>Ir a la app</button>
