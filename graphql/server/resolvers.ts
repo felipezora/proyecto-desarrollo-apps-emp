@@ -48,6 +48,82 @@ const resolvers: Resolver = {
       });
     },
   },
+  Project: {
+    leader: async (parent, args, context) => {
+      if (!parent.id_leader) {
+        return null;
+      }
+      return await context.db.user.findUnique({
+        where: {
+          id: parent.id_leader
+        },
+      });
+    },
+    department: async (parent, args, context) => {
+      if (!parent.departmentId) {
+        return null;
+      }
+      return await context.db.department.findUnique({
+        where: {
+          id: parent.departmentId
+        },
+      });
+    },
+    employees: async (parent, args, context) => {
+      return await context.db.user.findMany({
+        where: {
+          projectMember: {
+            some: {
+              id: parent.id,
+            }
+          }
+        },
+      });
+    },
+    files: async (parent, args, context) => {
+      return await context.db.file.findMany({
+        where: {
+          projectId: parent.id
+        },
+      });
+    },
+  },
+  Department: {
+    leader: async (parent, args, context) => {
+      return await context.db.user.findUnique({
+        where: {
+          id: parent.departmentLeaderId
+        },
+      });
+    },
+    employees: async (parent, args, context) => {
+      return await context.db.user.findMany({
+        where: {
+          departmentId: parent.id
+        },
+      });
+    },
+    projects: async (parent, args, context) => {
+      return await context.db.project.findMany({
+        where: {
+          departmentId: parent.id
+        },
+      });
+    },
+  },
+  File: {
+    project: async (parent, args, context) => {
+      return await context.db.project.findMany({
+        where: {
+          files: {
+            some: {
+              id: parent.id
+            },
+          },
+        },
+      });
+    }
+  },
   Query: {
     user: async (parent, args, context) => {
       return await context.db.user.findUnique({
