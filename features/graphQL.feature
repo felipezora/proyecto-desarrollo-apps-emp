@@ -1,13 +1,13 @@
 Feature: API GraphQL usando Cucumber
 
   Scenario: Crear un nuevo lider
-    Given que el usuario con email "testAdmin@test.com" es un administrador
-    When el usuario crea un nuevo usuario con email "testLeader@test.com" y nombre "testLeader" y id de rol "clh20dmqx002578unt4oczrof" y se obtiene el id del usuario
-    Then el usuario es agregado exitosamente y al buscarlo por el email "testLeader@test.com" se encuentra el usuario con id y nombre "testLeader" y rol "leader"
+    Given que el usuario con email "testfinal@test.com" es un "ADMINISTRATOR"
+    When el usuario le asigna al usuario con id "clhb55mu90000un98wt65zt35" el rol "LEADER" y se obtiene el id del usuario
+    Then el usuario es agregado exitosamente y al buscarlo por el email "testLeader@test.com" se encuentra el usuario con id y rol "LEADER"
 
   Scenario: Crear un nuevo empleado
     Given que el usuario con email "testAdmin@test.com" es un administrador
-    When el usuario crea un nuevo usuario con email "testEmployee@test.com" y nombre "testEmployee" y id de rol "clh20dmqx002378una856sdkt" y se obtiene el id del usuario
+    When el usuario crea un nuevo usuario con id "clhb55mu90000un98wt65zt35" y nombre "testEmployee" y id de rol "clh20dmqx002378una856sdkt" y se obtiene el id del usuario
     Then el usuario es agregado exitosamente y al buscarlo por el email "testEmployee@test.com" se encuentra el usuario con id y nombre "testEmployee" y rol "employee"
 
   Scenario: Crear un nuevo proyecto

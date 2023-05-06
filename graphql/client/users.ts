@@ -21,4 +21,22 @@ const GET_USER = gql`
   }
 `;
 
-export { GET_USERS, GET_USER };
+const USER_ROLE = gql`
+  query User($email: String!) {
+    user(email: $email) {
+      role {
+        name
+      }
+   }
+  }
+`;
+
+const UPDATE_USER_ROLE = gql`
+  mutation ChangeUserRole($idUser: String!, $role: String!) {
+    changeUserRole(idUser: $idUser, role: $role) {
+      id
+    }
+  }
+`;
+
+export { GET_USERS, GET_USER, USER_ROLE, UPDATE_USER_ROLE };

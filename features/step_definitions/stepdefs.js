@@ -9,16 +9,15 @@ let responseUserId;
 
 //Scenario: Crear usuarios
 Given(
-  'que el usuario con email {string} es un administrador',
-  async (email) => {
-    const query = `
-    query GetUser($email: String!) {
-      getUser(email: $email) {
-        role {
-          name
-        }
+  'que el usuario con email {string} es un {string}',
+  async (email, role) => {
+    const query = `query User($email: String!) {
+    user(email: $email) {
+      role {
+        name
       }
-    }`;
+   }
+  }`;
 
     const variables = {
       email: email,
@@ -26,61 +25,40 @@ Given(
 
     response = await request(endpoint, query, variables);
 
-    const { getUser } = response;
+    const { user } = response;
 
-    assert.strictEqual(getUser.role.name, 'administrator');
+    assert.strictEqual(user.role.name, role);
   }
 );
 
 When(
-  'el usuario crea un nuevo usuario con email {string} y nombre {string} y id de rol {string} y se obtiene el id del usuario',
-  async (email, name, roleId) => {
+  'el usuario le asigna al usuario con id {string} el rol {string} y se obtiene el id del usuario',
+  async (idUser, role) => {
     const mutation = `
-      mutation CreateUser($data: UserCreateInput!) {
-        createUser(data: $data) {
+      mutation ChangeUserRole($idUser: String!, $role: String!) {
+        changeUserRole(idUser: $idUser, role: $role) {
           id
-        }
-      }`;
-
-    const query = `
-    query GetUser($email: String!) {
-      getUser(email: $email) {
-        id
-      }
+        } 
     }`;
 
-    const variablesQuery = {
-      email: email,
-    };
-
     const variablesMutation = {
-      data: {
-        name,
-        email,
-        roleId,
-      },
+      idUser,
+      role,
     };
 
-    try {
-      response = await request(endpoint, mutation, variablesMutation);
-      const { createUser } = response;
-      responseUserId = createUser.id;
-    } catch (error) {
-      response = await request(endpoint, query, variablesQuery);
-      const { getUser } = response;
-      responseUserId = getUser.id;
-    }
+    response = await request(endpoint, mutation, variablesMutation);
+    const { changeUserRole } = response;
+    responseUserId = changeUserRole.id;
   }
 );
 
 Then(
-  'el usuario es agregado exitosamente y al buscarlo por el email {string} se encuentra el usuario con id y nombre {string} y rol {string}',
+  'el usuario es agregado exitosamente y al buscarlo por el email {string} se encuentra el usuario con id y rol {string}',
   async (email, name, role) => {
     const query = `
-    query GetUser($email: String!) {
-      getUser(email: $email) {
+    query User($email: String!) {
+      user(email: $email) {
         id
-        name
         role {
           name
         }
@@ -93,11 +71,11 @@ Then(
 
     response = await request(endpoint, query, variables);
 
-    const { getUser } = response;
+    const { user } = response;
 
-    assert.strictEqual(getUser.id, responseUserId);
-    assert.strictEqual(getUser.name, name);
-    assert.strictEqual(getUser.role.name, role);
+    assert.strictEqual(user.id, responseUserId);
+    assert.strictEqual(user.name, name);
+    assert.strictEqual(user.role.name, role);
   }
 );
 
