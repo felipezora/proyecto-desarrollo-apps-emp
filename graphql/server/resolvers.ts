@@ -161,6 +161,13 @@ const resolvers: Resolver = {
     changeUserRole: async (parent, args, context) => {
       const validationResult = await roleValidator(context, "ADMINISTRATOR");
       if (validationResult) {
+
+        const oldUser = await context.db.user.findUnique({
+          where: {
+            id: args.idUser
+          }
+        });
+
         const newUser = await context.db.user.update({
           where: {
             id: args.idUser,
@@ -173,6 +180,13 @@ const resolvers: Resolver = {
             }
           }
         });
+
+        await context.db.log.create({
+          data: {
+            description: `El usuario con email: ${context.session.user.email} ha hecho una modificación. Registro antes: ${JSON.stringify(oldUser)} Registro después: ${JSON.stringify(newUser)}`,
+          }
+        });
+
         return newUser;
       }
       return null;
@@ -181,7 +195,8 @@ const resolvers: Resolver = {
       const validationResult = await roleValidator(context, "ADMINISTRATOR");
       const { name, start_date, end_date, idDepartment } = args;
       if (validationResult) {
-        return await context.db.project.create({
+
+        const newProject = await context.db.project.create({
           data: {
             name: name,
             start_date: new Date(start_date),
@@ -193,13 +208,28 @@ const resolvers: Resolver = {
             }
           }
         });
+
+        await context.db.log.create({
+          data: {
+            description: `El usuario con email: ${context.session.user.email} ha hecho una creación. Registro: ${JSON.stringify(newProject)}`,
+          }
+        });
+
+        return newProject;
       }
       return null;
     },
     setProjectLeader: async (parent, args, context) => {
       const validationResult = await roleValidator(context, "ADMINISTRATOR");
       if (validationResult) {
-        return await context.db.project.update({
+
+        const oldProject = await context.db.project.findUnique({
+          where: {
+            id: args.idProject
+          }
+        });
+
+        const newProject = await context.db.project.update({
           where: {
             id: args.idProject,
           },
@@ -211,6 +241,14 @@ const resolvers: Resolver = {
             },
           },
         });
+
+        await context.db.log.create({
+          data: {
+            description: `El usuario con email: ${context.session.user.email} ha hecho una modificación. Registro antes: ${JSON.stringify(oldProject)} Registro después: ${JSON.stringify(newProject)}`,
+          }
+        });
+
+        return newProject;
       }
       return null;
     },
@@ -218,7 +256,14 @@ const resolvers: Resolver = {
       const { idEmployee, idProject } = args;
       const validationResult = await roleValidator(context, "ADMINISTRATOR");
       if (validationResult) {
-        return await context.db.project.update({
+
+        const oldProject = await context.db.project.findUnique({
+          where: {
+            id: idProject
+          }
+        });
+
+        const newProject = await context.db.project.update({
           where: {
             id: idProject
           },
@@ -230,17 +275,33 @@ const resolvers: Resolver = {
             }
           }
         })
+
+        await context.db.log.create({
+          data: {
+            description: `El usuario con email: ${context.session.user.email} ha hecho una modificación. Registro antes: ${JSON.stringify(oldProject)} Registro después: ${JSON.stringify(newProject)}`,
+          }
+        });
+
+        return newProject;
       }
       return null;
     },
     deleteProject: async (parent, args, context) => {
       const validationResult = await roleValidator(context, "ADMINISTRATOR");
       if (validationResult) {
-        return await context.db.project.delete({
+
+        const oldProject = context.db.project.delete({
           where: {
             id: args.idProject
           }
         })
+
+        await context.db.log.create({
+          data: {
+            description: `El usuario con email: ${context.session.user.email} ha hecho una eliminación. Registro: ${JSON.stringify(oldProject)}`,
+          }
+        });
+
       }
       return null;
     }
