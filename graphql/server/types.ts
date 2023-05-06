@@ -81,7 +81,7 @@ const typeDefs = gql`
     createFile(format: String!, name: String!, url: String!): File
     setProjectFile(idProject: String!): File
     removeProjectFile(idFile: String!): Project
-    changeUserRole(idUser: String!): User
+    changeUserRole(idUser: String!, role: String!): User
   }
 `;
 

@@ -1,3 +1,4 @@
+import { NetworkStatus } from '@apollo/client';
 import { Resolver } from 'types';
 
 const resolvers: Resolver = {
@@ -122,7 +123,7 @@ const resolvers: Resolver = {
           },
         },
       });
-    }
+    },
   },
   Query: {
     user: async (parent, args, context) => {
@@ -133,7 +134,45 @@ const resolvers: Resolver = {
       });
     }
   },
-  Mutation: {}
+  Mutation: {
+    changeUserRole: async (parent, args, context) => {
+      const { db, session } = context;
+
+      if (!session) {
+        return null;
+      }
+
+      const email = session.user?.email ?? '';
+
+      const user = await db.user.findUnique({
+        where: {
+          email: email,
+        },
+        include: {
+          role: true,
+        },
+      });
+
+      const userRole = user?.role?.name;
+      if (userRole && userRole === "ADMINISTRATOR") {
+        const newUser = await db.user.update({
+          where: {
+            id: args.idUser,
+          },
+          data: {
+            role: {
+              connect: {
+                name: args.role
+              }
+            }
+          }
+        });
+        return newUser;
+      }
+
+      return null;
+    }
+  },
 };
 
 export { resolvers };
