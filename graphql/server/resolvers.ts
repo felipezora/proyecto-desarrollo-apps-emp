@@ -1,7 +1,9 @@
-import { NetworkStatus } from '@apollo/client';
 import { Resolver } from 'types';
 
 const roleValidator = async ({ db, session }, requiredRole) => {
+
+  //return true;
+
   if (!session) {
     return false;
   }
@@ -155,6 +157,13 @@ const resolvers: Resolver = {
           email: args.email,
         },
       });
+    },
+    project: async (parent, args, context) => {
+      return await context.db.project.findUnique({
+        where: {
+          id: args.idProject,
+        },
+      });
     }
   },
   Mutation: {
@@ -183,7 +192,7 @@ const resolvers: Resolver = {
 
         await context.db.log.create({
           data: {
-            description: `El usuario con email: ${context.session.user.email} ha hecho una modificación. Registro antes: ${JSON.stringify(oldUser)} Registro después: ${JSON.stringify(newUser)}`,
+            description: `El usuario con email: ${context.session?.user?.email} ha hecho una modificación. Registro antes: ${JSON.stringify(oldUser)} Registro después: ${JSON.stringify(newUser)}`,
           }
         });
 
@@ -211,7 +220,7 @@ const resolvers: Resolver = {
 
         await context.db.log.create({
           data: {
-            description: `El usuario con email: ${context.session.user.email} ha hecho una creación. Registro: ${JSON.stringify(newProject)}`,
+            description: `El usuario con email: ${context.session?.user?.email} ha hecho una creación. Registro: ${JSON.stringify(newProject)}`,
           }
         });
 
@@ -244,7 +253,7 @@ const resolvers: Resolver = {
 
         await context.db.log.create({
           data: {
-            description: `El usuario con email: ${context.session.user.email} ha hecho una modificación. Registro antes: ${JSON.stringify(oldProject)} Registro después: ${JSON.stringify(newProject)}`,
+            description: `El usuario con email: ${context.session?.user?.email} ha hecho una modificación. Registro antes: ${JSON.stringify(oldProject)} Registro después: ${JSON.stringify(newProject)}`,
           }
         });
 
@@ -278,7 +287,7 @@ const resolvers: Resolver = {
 
         await context.db.log.create({
           data: {
-            description: `El usuario con email: ${context.session.user.email} ha hecho una modificación. Registro antes: ${JSON.stringify(oldProject)} Registro después: ${JSON.stringify(newProject)}`,
+            description: `El usuario con email: ${context.session?.user?.email} ha hecho una modificación. Registro antes: ${JSON.stringify(oldProject)} Registro después: ${JSON.stringify(newProject)}`,
           }
         });
 
@@ -290,18 +299,25 @@ const resolvers: Resolver = {
       const validationResult = await roleValidator(context, "ADMINISTRATOR");
       if (validationResult) {
 
-        const oldProject = context.db.project.delete({
-          where: {
-            id: args.idProject
-          }
-        })
+        try {
+          const oldProject = await context.db.project.findUnique({
+            where: {
+              id: args.idProject
+            }
+          });
 
-        await context.db.log.create({
-          data: {
-            description: `El usuario con email: ${context.session.user.email} ha hecho una eliminación. Registro: ${JSON.stringify(oldProject)}`,
-          }
-        });
+          await context.db.project.delete({
+            where: {
+              id: args.idProject
+            }
+          })
 
+          await context.db.log.create({
+            data: {
+              description: `El usuario con email: ${context.session?.user?.email} ha hecho una eliminación. Registro: ${JSON.stringify(oldProject)}`,
+            }
+          });
+        } catch (error) { }
       }
       return null;
     }

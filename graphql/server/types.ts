@@ -66,6 +66,7 @@ const typeDefs = gql`
     users: [User]
     userEmployeeProjects(idUser: String!): [Project]
     userLeaderProjects(idUser: String!): [Project]
+    project(idProject: String!): Project
     userLeaderDepartments(idUser: String!): [Department]
     projectFiles(idProject: String!): [File]
   }

@@ -35,6 +35,9 @@ const UPDATE_USER_ROLE = gql`
   mutation ChangeUserRole($idUser: String!, $role: String!) {
     changeUserRole(idUser: $idUser, role: $role) {
       id
+      role {
+        name
+      }
     }
   }
 `;

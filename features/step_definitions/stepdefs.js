@@ -20,13 +20,12 @@ Given(
   }`;
 
     const variables = {
-      email: email,
+      email,
     };
 
     response = await request(endpoint, query, variables);
 
     const { user } = response;
-
     assert.strictEqual(user.role.name, role);
   }
 );
@@ -54,7 +53,7 @@ When(
 
 Then(
   'el usuario es agregado exitosamente y al buscarlo por el email {string} se encuentra el usuario con id y rol {string}',
-  async (email, name, role) => {
+  async (email, role) => {
     const query = `
     query User($email: String!) {
       user(email: $email) {
@@ -66,7 +65,7 @@ Then(
     }`;
 
     const variables = {
-      email: email,
+      email,
     };
 
     response = await request(endpoint, query, variables);
@@ -74,7 +73,6 @@ Then(
     const { user } = response;
 
     assert.strictEqual(user.id, responseUserId);
-    assert.strictEqual(user.name, name);
     assert.strictEqual(user.role.name, role);
   }
 );
@@ -82,21 +80,20 @@ Then(
 //Scenario: Crear proyecto
 
 When(
-  'el usuario crea un nuevo proyecto con nombre {string} y fecha de inicio {string} y fecha planeada de fin {string} y se obtiene el id del proyecto',
-  async (name, start_date, end_date) => {
+  'el usuario crea un nuevo proyecto con nombre {string} y fecha de inicio {string} y fecha planeada de fin {string} y id de departamento {string} y se obtiene el id del proyecto',
+  async (name, startDate, endDate, idDepartment) => {
     const mutation = `
-      mutation CreateProject($data: ProjectCreateInput!) {
-        createProject(data: $data) {
+      mutation CreateProject($name: String!, $startDate: DateTime!, $endDate: DateTime!, $idDepartment: String!) {
+        createProject(name: $name, start_date: $startDate, end_date: $endDate, idDepartment: $idDepartment) {
           id
         }
-      }`;
+    }`;
 
     const variables = {
-      data: {
-        name,
-        start_date,
-        end_date,
-      },
+      name,
+      startDate,
+      endDate,
+      idDepartment,
     };
 
     response = await request(endpoint, mutation, variables);
@@ -111,47 +108,43 @@ Then(
   'el proyecto es agregado exitosamente y al buscarlo por el id se encuentra el proyecto con nombre {string} y fecha de inicio {string} y fecha planeada de fin {string}',
   async (name, start_date, end_date) => {
     const query = `
-      query GetProject($where: FilterId!) {
-        getProject(where: $where) {
+      query Project($idProject: String!) {
+        project(idProject: $idProject) {
           name
-          start_date
           end_date
-        }
-      }`;
+          start_date
+      }
+    }`;
 
     const variables = {
-      where: {
-        id: responseProjectId,
-      },
+      idProject: responseProjectId,
     };
 
     response = await request(endpoint, query, variables);
 
-    const { getProject } = response;
+    const { project } = response;
 
-    assert.strictEqual(getProject.name, name);
-    assert.strictEqual(getProject.start_date, start_date);
-    assert.strictEqual(getProject.end_date, end_date);
+    assert.strictEqual(project.name, name);
+    assert.strictEqual(project.start_date, start_date);
+    assert.strictEqual(project.end_date, end_date);
   }
 );
 
 //Scenario: Agregar un lider al proyecto
 
 When(
-  'el usuario agrega un lider con email {string} al proyecto con id',
-  async (email) => {
+  'el usuario agrega un lider con id {string} al proyecto con id',
+  async (idLeader) => {
     const mutation = `
-      mutation SetProjectLeader($where: FilterId!, $userEmail: String!) {
-         setProjectLeader(where: $where, userEmail: $userEmail) {
+      mutation SetProjectLeader($idLeader: String!, $idProject: String!) {
+        setProjectLeader(idLeader: $idLeader, idProject: $idProject) {
           id
         }
-      }`;
+    }`;
 
     const variables = {
-      where: {
-        id: responseProjectId,
-      },
-      userEmail: email,
+      idProject: responseProjectId,
+      idLeader,
     };
 
     await request(endpoint, mutation, variables);
@@ -162,8 +155,8 @@ Then(
   'el lider es agregado exitosamente al proyecto y al buscarlo por el id se encuentra el proyecto con el lider con email {string}',
   async (email) => {
     const query = `
-      query GetProject($where: FilterId!) {
-        getProject(where: $where) {
+      query Project($idProject: String!) {
+        project(idProject: $idProject) {
           leader {
             email
           }
@@ -171,35 +164,31 @@ Then(
       }`;
 
     const variables = {
-      where: {
-        id: responseProjectId,
-      },
+      idProject: responseProjectId,
     };
 
     response = await request(endpoint, query, variables);
 
-    const { getProject } = response;
+    const { project } = response;
 
-    assert.strictEqual(getProject.leader.email, email);
+    assert.strictEqual(project.leader.email, email);
   }
 );
 
 //Scenario: Agregar un miembro al proyecto
 When(
-  'el usuario agrega un empleado con email {string} al proyecto con id',
-  async (email) => {
+  'el usuario agrega un empleado con id {string} al proyecto con id',
+  async (idEmployee) => {
     const mutation = `
-      mutation AddProjectEmployee($where: FilterId!, $employeeEmail: String!) {
-        addProjectEmployee(where: $where, employeeEmail: $employeeEmail) {
+      mutation AddProjectEmployee($idEmployee: String!, $idProject: String!) {
+        addProjectEmployee(idEmployee: $idEmployee, idProject: $idProject) {
           id
         }
-      }`;
+    }`;
 
     const variables = {
-      where: {
-        id: responseProjectId,
-      },
-      employeeEmail: email,
+      idProject: responseProjectId,
+      idEmployee,
     };
 
     await request(endpoint, mutation, variables);
@@ -210,8 +199,8 @@ Then(
   'el empleado es agregado exitosamente al proyecto y al buscarlo por el id se encuentra el proyecto con el empleado con email {string}',
   async (email) => {
     const query = `
-      query GetProject($where: FilterId!) {
-        getProject(where: $where) {
+      query Project($idProject: String!) {
+        project(idProject: $idProject) {
           employees {
             email
           }
@@ -219,16 +208,14 @@ Then(
       }`;
 
     const variables = {
-      where: {
-        id: responseProjectId,
-      },
+      idProject: responseProjectId,
     };
 
     response = await request(endpoint, query, variables);
 
-    const { getProject } = response;
+    const { project } = response;
 
-    const employeeEmail = getProject.employees[0].email;
+    const employeeEmail = project.employees[0].email;
 
     assert.strictEqual(employeeEmail, email);
   }
@@ -236,18 +223,16 @@ Then(
 
 //Scenario: Elimitar proyecto
 
-When('el usuario elimina el proyecto con id {string}', async (id) => {
+When('el usuario elimina el proyecto con id', async () => {
   const mutation = `
-      mutation DeleteProject($where: FilterId!) {
-        deleteProject(where: $where){
+      mutation DeleteProject($idProject: String!) {
+        deleteProject(idProject: $idProject) {
           id
         }
       }`;
 
   const variables = {
-    where: {
-      id: responseProjectId,
-    },
+    idProject: responseProjectId,
   };
 
   await request(endpoint, mutation, variables);
@@ -257,22 +242,20 @@ Then(
   'el proyecto es eliminado exitosamente y al buscarlo por el id no se encuentra el proyecto',
   async () => {
     const query = `
-      query GetProject($where: FilterId!) {
-        getProject(where: $where) {
+      query Project($idProject: String!) {
+        project(idProject: $idProject) {
           id
         }
       }`;
 
     const variables = {
-      where: {
-        id: responseProjectId,
-      },
+      idProject: responseProjectId,
     };
 
     response = await request(endpoint, query, variables);
 
-    const { getProject } = response;
+    const { project } = response;
 
-    assert.strictEqual(getProject, null);
+    assert.strictEqual(project, null);
   }
 );
