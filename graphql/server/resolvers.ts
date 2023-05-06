@@ -1,6 +1,29 @@
 import { NetworkStatus } from '@apollo/client';
 import { Resolver } from 'types';
 
+const roleValidator = async ({ db, session }, requiredRole) => {
+  if (!session) {
+    return false;
+  }
+
+  const email = session.user?.email ?? '';
+
+  const user = await db.user.findUnique({
+    where: {
+      email: email,
+    },
+    include: {
+      role: true,
+    },
+  });
+
+  const userRole = user?.role?.name;
+  if (userRole && userRole === requiredRole) {
+    return true;
+  }
+  return false;
+}
+
 const resolvers: Resolver = {
   User: {
     department: async (parent, args, context) => {
@@ -136,26 +159,9 @@ const resolvers: Resolver = {
   },
   Mutation: {
     changeUserRole: async (parent, args, context) => {
-      const { db, session } = context;
-
-      if (!session) {
-        return null;
-      }
-
-      const email = session.user?.email ?? '';
-
-      const user = await db.user.findUnique({
-        where: {
-          email: email,
-        },
-        include: {
-          role: true,
-        },
-      });
-
-      const userRole = user?.role?.name;
-      if (userRole && userRole === "ADMINISTRATOR") {
-        const newUser = await db.user.update({
+      const validationResult = await roleValidator(context, "ADMINISTRATOR");
+      if (validationResult) {
+        const newUser = await context.db.user.update({
           where: {
             id: args.idUser,
           },
@@ -169,7 +175,73 @@ const resolvers: Resolver = {
         });
         return newUser;
       }
-
+      return null;
+    },
+    createProject: async (parent, args, context) => {
+      const validationResult = await roleValidator(context, "ADMINISTRATOR");
+      const { name, start_date, end_date, idDepartment } = args;
+      if (validationResult) {
+        return await context.db.project.create({
+          data: {
+            name: name,
+            start_date: new Date(start_date),
+            end_date: new Date(end_date),
+            department: {
+              connect: {
+                id: idDepartment
+              }
+            }
+          }
+        });
+      }
+      return null;
+    },
+    setProjectLeader: async (parent, args, context) => {
+      const validationResult = await roleValidator(context, "ADMINISTRATOR");
+      if (validationResult) {
+        return await context.db.project.update({
+          where: {
+            id: args.idProject,
+          },
+          data: {
+            leader: {
+              connect: {
+                id: args.idLeader
+              },
+            },
+          },
+        });
+      }
+      return null;
+    },
+    addProjectEmployee: async (parent, args, context) => {
+      const { idEmployee, idProject } = args;
+      const validationResult = await roleValidator(context, "ADMINISTRATOR");
+      if (validationResult) {
+        return await context.db.project.update({
+          where: {
+            id: idProject
+          },
+          data: {
+            employees: {
+              connect: {
+                id: idEmployee
+              }
+            }
+          }
+        })
+      }
+      return null;
+    },
+    deleteProject: async (parent, args, context) => {
+      const validationResult = await roleValidator(context, "ADMINISTRATOR");
+      if (validationResult) {
+        return await context.db.project.delete({
+          where: {
+            id: args.idProject
+          }
+        })
+      }
       return null;
     }
   },

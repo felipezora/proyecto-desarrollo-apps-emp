@@ -71,9 +71,9 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    createProject(name: String!, start_date: DateTime!, end_date: DateTime!): Project
-    setProjectLeader(idLeader: String!): Project
-    addProjectEmployee(idEmployee: String!): Project
+    createProject(name: String!, start_date: DateTime!, end_date: DateTime!, idDepartment: String!): Project
+    setProjectLeader(idLeader: String!, idProject: String!): Project
+    addProjectEmployee(idEmployee: String!, idProject: String!): Project
     removeProjectEmployee(idEmployee: String!): Project
     deleteProject(idProject: String!): Project
     createDepartment(name: String!, idLeader: String!): Department
