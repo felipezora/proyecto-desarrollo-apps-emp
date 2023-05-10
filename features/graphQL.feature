@@ -12,7 +12,7 @@ Feature: API GraphQL usando Cucumber
 
   Scenario: Crear un nuevo proyecto
     Given que el usuario con email "testadmin@test.com" es un "ADMINISTRATOR"
-    When el usuario crea un nuevo proyecto con nombre "Proyecto Test" y fecha de inicio "2023-04-01" y fecha planeada de fin "2023-05-01" y id de departamento "clhbah3vh0000d256hysn16a7" y se obtiene el id del proyecto
+    When el usuario crea un nuevo proyecto con nombre "Proyecto Test" y fecha de inicio "2023-04-01" y fecha planeada de fin "2023-05-01" y id de departamento "clhc0gf3k0000unfwhwtm8lmr" y se obtiene el id del proyecto
     Then el proyecto es agregado exitosamente y al buscarlo por el id se encuentra el proyecto con nombre "Proyecto Test" y fecha de inicio "2023-04-01T00:00:00.000Z" y fecha planeada de fin "2023-05-01T00:00:00.000Z"
 
   Scenario: Agregar un lider a un proyecto
